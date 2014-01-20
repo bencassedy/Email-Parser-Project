@@ -1,0 +1,3 @@
+
+class Email(msg):
+    def 

@@ -3,10 +3,8 @@ from email.message import Message
 from datetime import *
 import os
 from pymongo import MongoClient
+import config
 
-mailpath = open('/Users/bencassedy/projects/enron/enron_mail_20110402/maildir/kaminski-v/sent_items/2524.', 'r')
-
-maildir = '/Users/bencassedy/projects/enron/enron_mail_20110402/maildir/kaminski-v'
 
 def date_parser(s):
     months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -39,7 +37,7 @@ def mongowriter(new_posts):
     
 mails = []
         
-for root, subFolders, files in os.walk(maildir):
+for root, subFolders, files in os.walk(config.MAILDIR):
     for filename in files:
         if filename.endswith('.csv') == False:
             filePath = os.path.join(root, filename)
