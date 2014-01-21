@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Email Detail View{% endblock title %}
+
+{% block content %}
+    {% for k, v in msg.iteritems() %}
+        {% if k == 'body' %}
+            <div>
+                <p class="text-right">{{ v }}</p>
+            </div>
+        {% else %}
+            <dl class="dl-horizontal">
+                <dt> {{ k }} </dt>
+                <dd> {{ v }} </dd>
+            </dl>
+        {% endif %}
+    {% endfor %}
+{% endblock content %}

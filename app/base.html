@@ -8,10 +8,10 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-    <title>Jumbotron Template for Bootstrap</title>
+    <title>{% block title %}{% endblock title %}</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="dist/css/bootstrap.css" rel="stylesheet">
+    <link href="static/bootstrap/css/bootstrap.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="jumbotron.css" rel="stylesheet">
@@ -44,9 +44,9 @@
 	  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 		<ul class="nav navbar-nav">
 		  <li class="active"><a href="#">List</a></li>
-		  <li><a href="#">Detail</a></li>
+		  <li><a href="#">Tags</a></li>
 		  <li class="dropdown">
-			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Options<b class="caret"></b></a>
 			<ul class="dropdown-menu">
 			  <li><a href="#">All</a></li>
 			  <li><a href="#">Pivot</a></li>
@@ -65,9 +65,8 @@
 		  <button type="submit" class="btn btn-default">Submit</button>
 		</form>
 		<ul class="nav navbar-nav navbar-right">
-		  <li><a href="#">Coding</a></li>
 		  <li class="dropdown">
-			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
 			<ul class="dropdown-menu">
 			  <li><a href="#">Users</a></li>
 			  <li><a href="#">Tags</a></li>
@@ -79,40 +78,13 @@
 		</ul>
 	  </div><!-- /.navbar-collapse -->
 	</nav>
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <h1>Hipster E-Discovery</h1>
-        <p>JOB BASED PLUG. How does this help the user/buyer accompish a given job? Next sentence does't fulfill that. Perform advanced analytics on e-discovery data at a fraction of the current rate, using features such as near-duplicate detection, concept clustering, classification, and similarity ranking. Those features, along with standard metadata and text search, are part of the core package of this solution.</p>
-        <p><a class="btn btn-success" role="button">Learn more &raquo;</a></p>
-      </div>
-    </div>
-
-    <div class="container">
-      <!-- Example row of columns -->
-      <div class="row">
-        <div class="col-md-4">
-          <h2>Supervised Machine Learning</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        <div class="content container">
+            {% block content %}{% endblock content %}
         </div>
-        <div class="col-md-4">
-          <h2>Unsupervised Machine Learning</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-       </div>
-        <div class="col-md-4">
-          <h2>Advanced Search</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div>
-      </div>
 
       <hr>
 
       <footer>
-        <p>&copy; Company 2013</p>
         <div class="navbar-collapse collapse">
           <form class="navbar-form navbar-right" role="form">
             <div class="form-group">
@@ -124,6 +96,7 @@
             <button type="submit" class="btn btn-success">Sign in</button>
           </form>
         </div><!--/.navbar-collapse -->
+        <p>&copy; Company 2013</p>
       </footer>
     </div> <!-- /container -->
 
@@ -132,6 +105,6 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="../../dist/js/bootstrap.min.js"></script>
+    <script src="static/bootstrap/js/bootstrap.min.js"></script>
   </body>
 </html>
