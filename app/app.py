@@ -1,17 +1,16 @@
-from flask import Flask, render_template
+from flask import Flask, redirect, render_template, url_for
 from pymongo import MongoClient
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
-client = MongoClient('localhost', 27017)
+client = MongoClient()
 db = client.enron
 emails = db.test_kaminski
 
 @app.route('/')
-@app.route('/index/')
+@app.route('/index')
 def index():
-    # change render template to url_for landing page
-    return render_template('base.html')
+    return app.send_static_file('index.html')
 
 @app.route('/email/<message_id>/')
 def email_detail(message_id):
@@ -19,7 +18,7 @@ def email_detail(message_id):
     msg = emails.find_one({'Message-ID': message_id}) 
     return render_template('detail.html', msg=msg)
 
-@app.route('/emails/')
+@app.route('/emails')
 def email_list():
     return render_template('list.html')
 
