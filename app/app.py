@@ -1,5 +1,6 @@
 from flask import Flask, redirect, render_template, url_for
 from pymongo import MongoClient
+import config
 
 app = Flask(__name__, static_url_path='')
 
@@ -20,7 +21,9 @@ def email_detail(message_id):
 
 @app.route('/emails')
 def email_list():
-    return render_template('list.html')
+    flds = config.LIST_VIEW_FIELDS
+    msgs = emails.find(fields=flds, limit=200)
+    return render_template('list.html', msgs=msgs, flds=flds)
 
 if __name__ == '__main__':
     app.run(debug=True)

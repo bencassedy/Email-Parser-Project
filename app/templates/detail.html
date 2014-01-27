@@ -6,12 +6,12 @@
     {% for k, v in msg.iteritems() %}
         {% if k == 'body' %}
             <div>
-                <p class="text-right">{{ v }}</p>
+                <p id="mail_body">{{ v.replace('\n', '<br />')|safe }}<p>
             </div>
         {% else %}
             <dl class="dl-horizontal">
-                <dt> {{ k }} </dt>
-                <dd> {{ v }} </dd>
+                <dt style="text-align: left; font-size:85%"> {{ k }} </dt>
+                <dd style="font-size:85%"> {{ v }} </dd>
             </dl>
         {% endif %}
     {% endfor %}

@@ -3,6 +3,29 @@
 {% block title %}Email List View{% endblock title %}
 
 {% block content %}
-    <h2>Email List View</h2>
-    <p>Placeholder paragraph</p>
+    <h1>Email List View</h1>
+    <table class="table table-condensed table-hover" style="font-size:80%">
+    {% for f in flds %}
+    	<th>{{ f }}</th>
+    {% endfor %}	
+    {% for msg in msgs %}
+    	<tr>
+		{% for k, v in msg.iteritems() %}
+			{% if k == 'Message-ID' %}
+				<td><a href="email/{{ v }}">{{ msg['Subject'] }}</td>
+			{% elif k == 'Subject' %}
+				{{ pass }}
+			{% elif k == '_id' %}
+				{{ pass }}
+			{% else %}
+				{% if v == '' %}
+					<td>&nbsp None</td>
+				{% else %}
+					<td>{{ v }}</td>
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+		</tr>
+	{% endfor %}
+	</table>
 {% endblock content %}
