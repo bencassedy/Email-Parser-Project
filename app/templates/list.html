@@ -3,7 +3,8 @@
 {% block title %}Email List View{% endblock title %}
 
 {% block content %}
-    <h1>Email List View</h1>
+    <h3>Email List View</h3>
+    <p class="text-align-left">Hits: <span class="badge">{{ total }}</span></p>
     <table class="table table-condensed table-hover" style="font-size:80%">
     {% for f in flds %}
     	<th>{{ f }}</th>

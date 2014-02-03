@@ -48,10 +48,17 @@ def email_list(query=None):
     flds = config.LIST_VIEW_FIELDS
     if query == None:
         msgs = emails.find(fields=flds, limit=200)
+        total = msgs.count()
     else:
         results = es.search({'query': {'match': {'_all': query}}, 'sort': {'_score': {'order': 'desc'}}}, index='test_kaminski')
+        total = results['hits']['total']
         msgs = es_to_dict(results)
-    return render_template('list.html', msgs=msgs, flds=flds)
+    return render_template('list.html', msgs=msgs, flds=flds, total=total)
+
+@app.route('/search')
+def email_search():
+    pass
+    return render_template('search.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
