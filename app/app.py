@@ -33,7 +33,8 @@ def es_to_dict(results):
 @app.route('/')
 @app.route('/index')
 def index():
-    return app.send_static_file('index.html')
+    db_name = emails.full_name
+    return render_template('landing.html', db_name=db_name)
 
 @app.route('/email/<message_id>/')
 def email_detail(message_id):
@@ -43,22 +44,24 @@ def email_detail(message_id):
 
 @app.route('/emails')
 def email_list(query=None):
-    query = request.args.get('search')
     # if no search, return all results, limit to 200 for debugging purposes
     flds = config.LIST_VIEW_FIELDS
-    if query == None:
+    query = request.args.get('search')
+    adv_query = request.args.get('adv_search')
+    if query is None:
         msgs = emails.find(fields=flds, limit=200)
         total = msgs.count()
     else:
-        results = es.search({'query': {'match': {'_all': query}}, 'sort': {'_score': {'order': 'desc'}}}, index='test_kaminski')
+        results = es.search({'query': {'fuzzy_like_this': {'fields': ['Subject', 'body'], 'like_text': query, 'max_query_terms': 12, 'prefix_length': 3}}, 'sort': {'_score': {'order': 'desc'}}}, index='test_kaminski')
         total = results['hits']['total']
         msgs = es_to_dict(results)
-    return render_template('list.html', msgs=msgs, flds=flds, total=total)
 
-@app.route('/search')
-def email_search():
-    pass
-    return render_template('search.html')
+    # idea here is to add GET parameter so it looks like /emails?search_type=advanced_search&search=query but it's not working
+    #elif request.args['search_type'] is 'adv_search':
+    #    results = es.search({'query': {'query_string': {'default_field': 'body', 'query': query}}, 'sort': {'_score': {'order': 'desc'}}}, index='test_kaminski')
+    #    total = results['hits']['total']
+    #    msgs = es_to_dict(results)
+    return render_template('list.html', msgs=msgs, flds=flds, total=total, query=query)
 
 if __name__ == '__main__':
     app.run(debug=True)
