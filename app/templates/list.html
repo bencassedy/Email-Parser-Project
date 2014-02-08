@@ -13,7 +13,7 @@
     	<tr>
 		{% for k, v in msg.iteritems() %}
 			{% if k == 'Message-ID' %}
-				<td><a href="email/{{ v }}">{{ msg['Subject'] }}</td>
+				<td><a href="/email/{{ v }}">{{ msg['Subject'] }}</td>
 			{% elif k == 'Subject' %}
 				{{ pass }}
 			{% elif k == '_id' %}
