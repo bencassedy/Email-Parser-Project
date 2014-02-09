@@ -43,6 +43,7 @@ def email_detail(message_id):
     return render_template('detail.html', msg=msg)
 
 @app.route('/emails')
+@app.route('/emails/')
 def email_list(query=None):
     # if no search, return all results, limit to 200 for debugging purposes
     flds = config.LIST_VIEW_FIELDS
