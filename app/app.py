@@ -1,5 +1,6 @@
 from flask import Flask, redirect, render_template, url_for, request
-from pyelasticsearch import ElasticSearch
+from elasticsearch import Elasticsearch
+from elasticsearch import helpers
 from pymongo import MongoClient
 from bson.json_util import dumps, loads
 import config
@@ -16,10 +17,16 @@ for email in emails.find():
     #e = dumps(email)
     #e_dict = dict(e)
     email['_id'] = str(email['_id'])
-    email_list.append(email)
+    action = {
+            "_index": "test_kaminski",
+            "_type": "email",
+            "_id": email['_id'],
+            "_souce": email
+            }
+    email_list.append(action)
 
-es = ElasticSearch('http://localhost:9200/')
-es.bulk_index(index='test_kaminski', doc_type='email', docs=email_list, id_field='_id')
+es = Elasticsearch()
+helpers.bulk(es, email_list)
 
 # convert es search results to python array of dicts
 def es_to_dict(results):
@@ -53,7 +60,7 @@ def email_list(query=None):
         msgs = emails.find(fields=flds, limit=200)
         total = msgs.count()
     else:
-        results = es.search({'query': {'fuzzy_like_this': {'fields': ['Subject', 'body'], 'like_text': query, 'max_query_terms': 12, 'prefix_length': 3}}, 'sort': {'_score': {'order': 'desc'}}}, index='test_kaminski')
+        results = es.search(index='test_kaminski', doc_type='email', body={}, _source=True, default_operator='AND', df='body', sort=['_score:desc'], suggest_field='body')
         total = results['hits']['total']
         msgs = es_to_dict(results)
 
