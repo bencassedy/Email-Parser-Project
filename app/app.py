@@ -60,7 +60,7 @@ def email_list(query=None):
         msgs = emails.find(fields=flds, limit=200)
         total = msgs.count()
     else:
-        results = es.search(index='test_kaminski', doc_type='email', body={'query': { 'query_string': { 'default_field': 'body', 'query': query }}, 'sort': {'_score': {'order': 'desc'}}}, _source=True, default_operator='AND') 
+        results = es.search(index='test_kaminski', doc_type='email', body={'query': { 'query_string': { 'default_field': 'body', 'query': query }}, 'sort': {'_score': {'order': 'desc'}}}, _source=True, analyze_wildcard=True, default_operator='AND') 
         total = results['hits']['total']
         msgs = es_to_dict(results)
 
