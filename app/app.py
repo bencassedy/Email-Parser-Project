@@ -21,7 +21,7 @@ for email in emails.find():
             "_index": "test_kaminski",
             "_type": "email",
             "_id": email['_id'],
-            "_souce": email
+            "_source": email
             }
     email_list.append(action)
 
