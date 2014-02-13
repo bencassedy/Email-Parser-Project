@@ -59,8 +59,12 @@ def email_list(query=None):
     if query is None:
         msgs = emails.find(fields=flds, limit=200)
         total = msgs.count()
-    else:
-        results = es.search(index='test_kaminski', doc_type='email', body={'query': { 'query_string': { 'default_field': 'body', 'query': query }}, 'sort': {'_score': {'order': 'desc'}}}, _source=True, analyze_wildcard=True, default_operator='AND') 
+    elif request.args.get('search'):
+        results = es.search(index='test_kaminski', doc_type='email', body={'query': { 'query_string': { 'default_field': 'body', 'query': query }}, 'sort': {'_score': {'order': 'desc'}}}, size=100, _source=True, analyze_wildcard=True, default_operator='AND') 
+        total = results['hits']['total']
+        msgs = es_to_dict(results)
+    elif request.args['search_type'] is 'adv_search':
+        results = es.search(index='test_kaminski', doc_type='email', body={'query': {'more_like_this': { 'fields': ['Subject', 'body'], 'like_text': query, 'percent_terms_to_match': 0.6, 'min_term_freq': 1, 'min_doc_freq': 1, 'max_query_terms': 12, 'prefix_length': 4, 'boost': 1.2 }}, 'sort': {'_score': {'order': 'desc' }}}, size=100, _source=True, analyze_wildcard=True)
         total = results['hits']['total']
         msgs = es_to_dict(results)
 

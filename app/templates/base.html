@@ -73,7 +73,7 @@
 		</ul>
 		<form class="navbar-form navbar-left" role="search">
 		  <div class="form-group">
-                      <input name="search" type="text" class="search-query" placeholder="Search" value="{% if query %}{{ query }}{% endif %}">
+                      <input name="search" onClick="this.select();" type="text" class="search-query" placeholder="Search" value="{% if query %}{{ query }}{% endif %}">
 		  </div>
 		  <button type="submit" class="btn btn-default">Submit</button>
                 <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#adv_query">Advanced Search</button>
@@ -95,7 +95,7 @@
         <div id="adv_query" class="collapse"><p>Advanced Query: </p>
             <div class="form-group">
                 <form class="navbar-form" role="search">
-                    <input name="search" type="text" class="form-control" rows="2" placeholder="Enter boolean search query" value="{% if query %}{{ query }}{% endif %}">
+                    <input name="search" onClick="this.select();" type="text" class="form-control" rows="2" placeholder="Enter boolean search query" value="{% if query %}{{ query }}{% endif %}">
                     <input type="hidden" name="search_type" value="adv_search">
                     <p class="text-right"><button type="submit" class="btn btn-default btn-sm">Submit</button></p>
                 </form>
