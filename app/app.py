@@ -47,15 +47,15 @@ def index():
 def email_detail(message_id):
     # get email from mongodb using query by id
     msg = emails.find_one({'Message-ID': message_id}) 
+    msg_id = str(msg['_id'])
     return render_template('detail.html', msg=msg)
 
 @app.route('/emails')
 @app.route('/emails/')
-def email_list(query=None):
+def email_list(query=None, msg_id=None):
     # if no search, return all results, limit to 200 for debugging purposes
     flds = config.LIST_VIEW_FIELDS
     query = request.args.get('search')
-    adv_query = request.args.get('adv_search')
     if query is None:
         msgs = emails.find(fields=flds, limit=200)
         total = msgs.count()
@@ -65,6 +65,13 @@ def email_list(query=None):
         msgs = es_to_dict(results)
     elif request.args['search_type'] is 'adv_search':
         results = es.search(index='test_kaminski', doc_type='email', body={'query': {'more_like_this': { 'fields': ['Subject', 'body'], 'like_text': query, 'percent_terms_to_match': 0.6, 'min_term_freq': 1, 'min_doc_freq': 1, 'max_query_terms': 12, 'prefix_length': 4, 'boost': 1.2 }}, 'sort': {'_score': {'order': 'desc' }}}, size=100, _source=True, analyze_wildcard=True)
+        total = results['hits']['total']
+        msgs = es_to_dict(results)
+    elif request.args['msg_id'] is not None:
+        #results = es.mlt(index='test_kaminski', doc_type='email', id=msg_id)
+        msg = emails.find_one({'_id': msg_id })
+        query = msg['body']
+        results = es.search(index='test_kaminski', doc_type='email', body={'query': {'more_like_this': { 'fields': ['body'], 'like_text': query, 'percent_terms_to_match': 0.6, 'min_term_freq': 1, 'min_doc_freq': 1, 'max_query_terms': 12, 'prefix_length': 4, 'boost': 1.2 }}, 'sort': {'_score': {'order': 'desc' }}}, size=100, _source=True, analyze_wildcard=True)
         total = results['hits']['total']
         msgs = es_to_dict(results)
 

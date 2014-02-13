@@ -2,6 +2,8 @@
 
 {% block title %}Email Detail View{% endblock title %}
 
+{% block MLT %}<a href="{{ url_for('email_list', msg_id=msg['_id'], search=msg['body']) }}" class="btn btn-success"><input type="hidden" name="search" value="{{ msg['body'] }}" />More Like This</a>{% endblock MLT %}
+
 {% block content %}
     {% for k, v in msg.iteritems() %}
         {% if k == 'body' %}
