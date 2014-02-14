@@ -1,1 +1,1 @@
-MAILDIR='/Users/bencassedy/bin/projects/20110402_enron_mail/maildir/kaminski-v'
+MAILDIR='/Users/bencassedy/projects/enron/enron_mail_20110402/maildir/kaminski-v'
