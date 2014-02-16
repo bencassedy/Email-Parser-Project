@@ -26,6 +26,21 @@ for email in emails.find():
     email_list.append(action)
 
 es = Elasticsearch()
+
+if es.indices.exists(index='test_kaminski') is False:
+    es.indices.create(index='test_kaminski')
+
+# close index to perform the next few operations
+es.indices.close(index='test_kaminski')
+
+# register tokenizer for text search
+es.indices.put_settings(index='test_kaminski', body={'analysis': {'tokenizer': 'uax_url_email'}})
+
+# store email body field for MLT and advanced analysis
+es.indices.put_mapping(index='test_kaminski', doc_type='email', body={'email': {'properties': {'body': {'store': True, 'term_vector': 'with_positions_offsets', 'type': 'string', 'index': 'analyzed'}}}})
+
+es.indices.open(index='test_kaminski')
+
 helpers.bulk(es, email_list)
 
 # convert es search results to python array of dicts
@@ -64,7 +79,7 @@ def email_list(query=None, msg_id=None):
 
 # execute basic keyword search
     elif request.args.get('search'):
-        results = es.search(index='test_kaminski', doc_type='email', body={'query': { 'query_string': { 'default_field': 'body', 'query': query }}, 'sort': {'_score': {'order': 'desc'}}}, size=100, _source=True, analyze_wildcard=True, default_operator='AND') 
+        results = es.search(index='test_kaminski', doc_type='email', body={'query': {'more_like_this': { 'fields': ['Subject', 'body'], 'like_text': query, 'percent_terms_to_match': 0.6, 'min_term_freq': 1, 'min_doc_freq': 1, 'max_query_terms': 12, 'boost': 1.2 }}, 'sort': {'_score': {'order': 'desc' }}}, size=100, _source=True, analyze_wildcard=True)
         total = results['hits']['total']
         msgs = es_to_dict(results)
 
@@ -77,7 +92,7 @@ def email_adv_search(query=None):
     
 # execute advanced boolean search
     if request.args.get('search'):
-        results = es.search(index='test_kaminski', doc_type='email', body={'query': {'more_like_this': { 'fields': ['Subject', 'body'], 'like_text': query, 'percent_terms_to_match': 0.6, 'min_term_freq': 1, 'min_doc_freq': 1, 'max_query_terms': 12, 'boost': 1.2 }}, 'sort': {'_score': {'order': 'desc' }}}, size=100, _source=True, analyze_wildcard=True)
+        results = es.search(index='test_kaminski', doc_type='email', body={'query': { 'query_string': { 'default_field': 'body', 'query': query }}, 'sort': {'_score': {'order': 'desc'}}}, size=100, _source=True, analyze_wildcard=True, default_operator='AND') 
         total = results['hits']['total']
         msgs = es_to_dict(results)
 
@@ -91,11 +106,10 @@ def email_mlt(query=None, msg_id=None):
 
 # execute More Like This search of single doc to find similar docs
 # Note: In order to use the mlt feature a mlt_field needs to be either be stored, store term_vector or source needs to be enabled.
-    if request.args.get('search'):
-        results = es.mlt(index='test_kaminski', doc_type='email', id=msg_id)
-        #query = msg['body']
-        total = results['hits']['total']
-        msgs = es_to_dict(results)
+    results = es.mlt(index='test_kaminski', doc_type='email', id=msg_id)
+    #query = msg['body']
+    total = results['hits']['total']
+    msgs = es_to_dict(results)
 
     return render_template('list.html', msgs=msgs, total=total, query=query)
 
