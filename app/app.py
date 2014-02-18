@@ -92,7 +92,7 @@ def email_adv_search(query=None):
     
 # execute advanced boolean search
     if request.args.get('search'):
-        results = es.search(index='test_kaminski', doc_type='email', body={'query': { 'query_string': { 'default_field': 'body', 'query': query }}, 'sort': {'_score': {'order': 'desc'}}}, size=100, _source=True, analyze_wildcard=True, default_operator='AND') 
+        results = es.search(index='test_kaminski', doc_type='email', body={'filter': {'query': { 'query_string': { 'default_field': 'body', 'query': query }}}, 'sort': {'_score': {'order': 'desc'}}}, size=100, _source=True, analyze_wildcard=True, default_operator='AND') 
         total = results['hits']['total']
         msgs = es_to_dict(results)
 
