@@ -102,11 +102,11 @@ def email_adv_search(query=None):
 def email_mlt(msg_id=None):
 
 # execute More Like This search of single doc to find similar docs
-    results = es.mlt(index='test_kaminski', doc_type='email', id=msg_id)
+    results = es.mlt(index='test_kaminski', doc_type='email', id=msg_id, mlt_fields=['Subject', 'body'], percent_terms_to_match=0.6, min_doc_freq=1, min_term_freq=1, body={'sort': {'_score': {'order': 'desc'}}})
     total = results['hits']['total']
     msgs = es_to_dict(results)
 
-    return render_template('list.html', msgs=msgs, total=total, query=query)
+    return render_template('list.html', msgs=msgs, total=total)
 
 if __name__ == '__main__':
     app.run(debug=True)
