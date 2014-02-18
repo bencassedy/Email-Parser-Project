@@ -79,7 +79,7 @@ def email_list(query=None, msg_id=None):
 
 # execute basic keyword search
     elif request.args.get('search'):
-        results = es.search(index='test_kaminski', doc_type='email', body={'query': {'more_like_this': { 'fields': ['Subject', 'body'], 'like_text': query, 'percent_terms_to_match': 0.6, 'min_term_freq': 1, 'min_doc_freq': 1, 'max_query_terms': 12, 'boost': 1.2 }}, 'sort': {'_score': {'order': 'desc' }}}, size=100, _source=True, analyze_wildcard=True)
+        results = es.search(index='test_kaminski', doc_type='email', body={'query': {'fuzzy_like_this': { 'fields': ['Subject', 'body'], 'like_text': query, 'prefix_length': 4, 'max_query_terms': 12, 'boost': 1.2 }}, 'sort': {'_score': {'order': 'desc' }}}, size=100, _source=True, analyze_wildcard=True)
         total = results['hits']['total']
         msgs = es_to_dict(results)
 
@@ -98,16 +98,11 @@ def email_adv_search(query=None):
 
     return render_template('list.html', msgs=msgs, total=total, query=query)
 
-@app.route('/emails/mlt')
-def email_mlt(query=None, msg_id=None):
-
-    query = request.args.get('search')
-    msg = emails.find_one({'_id': msg_id })
+@app.route('/emails/mlt/<msg_id>/')
+def email_mlt(msg_id=None):
 
 # execute More Like This search of single doc to find similar docs
-# Note: In order to use the mlt feature a mlt_field needs to be either be stored, store term_vector or source needs to be enabled.
     results = es.mlt(index='test_kaminski', doc_type='email', id=msg_id)
-    #query = msg['body']
     total = results['hits']['total']
     msgs = es_to_dict(results)
 

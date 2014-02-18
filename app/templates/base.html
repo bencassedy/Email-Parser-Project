@@ -73,7 +73,7 @@
 		</ul>
 		<form class="navbar-form navbar-left" action="{{ url_for('email_list', search_type=basic_search) }}"  role="search">
 		  <div class="form-group">
-                      <input name="search" onClick="this.select();" type="text" class="search-query" placeholder="Fuzzy Search" value="{% if query %}{{ query }}{% endif %}">
+                      <input name="search" onClick="this.select();" type="text" class="search-query" style="width:350px;" placeholder="Fuzzy Search" value="{% if query %}{{ query }}{% endif %}">
 		  </div>
                   <button type="submit" class="btn btn-default" >Submit</button>
                 <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#adv_query">Advanced Search</button>
