@@ -1,5 +1,7 @@
 Flask
 Flask-Script
+Flask-WTF
 mongoengine
+pymongo
 pyelasticsearch
 

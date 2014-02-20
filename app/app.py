@@ -3,9 +3,11 @@ from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 from pymongo import MongoClient
 from bson.json_util import dumps, loads
+from forms import SearchForm
 import config
 
 app = Flask(__name__, static_url_path='')
+app.config.from_object('config')
 
 client = MongoClient()
 db = client.enron
@@ -52,6 +54,14 @@ def es_to_dict(results):
             resultset.append(hit['_source'])
     return resultset
 
+## helper function to sort mongodb keys, for use in search forms
+#def keys_to_sorted_list(k):
+#    keys = []
+#    keys.append(str(emails.distinct(k)))
+#    sorted_keys = keys.sort()
+#    return sorted_keys
+
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -85,6 +95,13 @@ def email_list(query=None, msg_id=None):
 
     return render_template('list.html', msgs=msgs, flds=flds, total=total, query=query)
 
+@app.route('/email_search', methods=['GET', 'POST'])
+def email_search():
+    form = SearchForm()
+    form.folders.choices = [(f, f) for f in emails.distinct('X-Folder')]
+    form.custodians.choices = [(f, f) for f in emails.distinct('X-Origin')]
+    return render_template('search_form.html', form=form)
+
 @app.route('/emails/adv_search')
 def email_adv_search(query=None):
 
@@ -102,7 +119,7 @@ def email_adv_search(query=None):
 def email_mlt(msg_id=None):
 
 # execute More Like This search of single doc to find similar docs
-    results = es.mlt(index='test_kaminski', doc_type='email', id=msg_id, mlt_fields=['Subject', 'body'], percent_terms_to_match=0.6, min_doc_freq=1, min_term_freq=1, body={'sort': {'_score': {'order': 'desc'}}})
+    results = es.mlt(index='test_kaminski', doc_type='email', id=msg_id, mlt_fields=['body'], percent_terms_to_match=0.7, min_doc_freq=1, min_term_freq=1, body={'sort': {'_score': {'order': 'desc'}}})
     total = results['hits']['total']
     msgs = es_to_dict(results)
 
