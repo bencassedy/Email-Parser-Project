@@ -39,7 +39,7 @@ es.indices.close(index='test_kaminski')
 es.indices.put_settings(index='test_kaminski', body={'analysis': {'tokenizer': 'uax_url_email'}})
 
 # store email body field for MLT and advanced analysis
-es.indices.put_mapping(index='test_kaminski', doc_type='email', body={'email': {'properties': {'body': {'store': True, 'term_vector': 'with_positions_offsets', 'type': 'string', 'index': 'analyzed'}}}})
+es.indices.put_mapping(index='test_kaminski', doc_type='email', body={'email': {'properties': {'body': {'store': True, 'term_vector': 'with_positions_offsets', 'type': 'string', 'index': 'analyzed'}}, {'X-Folder': {'analysis': {'tokenizer': 'path_hierarchy'}}}}})
 
 es.indices.open(index='test_kaminski')
 
@@ -100,6 +100,12 @@ def email_search():
     form = SearchForm()
     form.folders.choices = [(f, f) for f in emails.distinct('X-Folder')]
     form.custodians.choices = [(f, f) for f in emails.distinct('X-Origin')]
+    if request.method == 'POST' and form.validate():
+        folders = form.folders.data
+        results = es.search(index='test_kaminski', doc_type='email', body={'filter': {'query': {'query_string': {'default_field': 'X-Folder', 'query': folders }}}}, default_operator='OR')
+        total = results['hits']['total']
+        msgs = es_to_dict(results)
+        return render_template('list.html', msgs=msgs, total=total)
     return render_template('search_form.html', form=form)
 
 @app.route('/emails/adv_search')
