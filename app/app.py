@@ -61,6 +61,15 @@ def es_to_dict(results):
 #    sorted_keys = keys.sort()
 #    return sorted_keys
 
+# helper function to stringify lists for es queries
+def list_to_string(lst):
+    new_list = []
+    for l in lst:
+        l = str(l)
+        new_list.append(l)
+    word_list = str(new_list).replace('[', '').replace(']', '').replace('\'', '')
+    word_list = word_list.encode('utf-8')
+    return word_list
 
 @app.route('/')
 @app.route('/index')
@@ -100,12 +109,14 @@ def email_search():
     form = SearchForm()
     form.folders.choices = [(f, f) for f in emails.distinct('X-Folder')]
     form.custodians.choices = [(f, f) for f in emails.distinct('X-Origin')]
+    form.recipients.choices = [(f, f) for f in emails.distinct('To')]
     if request.method == 'POST' and form.validate():
-        folders = form.folders.data
-        results = es.search(index=config.INDEX, doc_type='email', body={'filter': {'query': {'query_string': {'default_field': 'X-Folder', 'query': folders }}}}, default_operator='OR')
+        recipients = form.recipients.data
+        recipients = list_to_string(recipients)
+        results = es.search(index=config.INDEX, doc_type='email', body={'filter': {'query': {'match': {'To': {'query': recipients, 'operator': 'OR' }}}}})
         total = results['hits']['total']
         msgs = es_to_dict(results)
-        return render_template('list.html', msgs=msgs, total=total)
+        return render_template('list.html', recipients=recipients, msgs=msgs, total=total)
     return render_template('search_form.html', form=form)
 
 @app.route('/emails/adv_search')

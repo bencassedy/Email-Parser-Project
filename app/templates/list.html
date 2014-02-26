@@ -5,6 +5,7 @@
 {% block content %}
     <h4>Email List View</h4>
     <p class="text-align-left">Hits: <span class="badge">{{ total }}</span></p>
+        <p>{{ recipients }}</p>
     <table class="table table-condensed table-hover" style="font-size:80%">
     {% for f in flds %}
     	<th>{{ f }}</th>

@@ -20,6 +20,7 @@ SETTINGS_BODY = {
                             }
                         }
                     }
+
 MAPPING_BODY = {
                 'email': {
                     'properties': {
