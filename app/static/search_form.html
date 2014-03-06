@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html ng-app="esApp">
+	<head>
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+
+		<!-- project dependency libs -->
+		<script src="common/lib/angular/angular.js"></script>
+        <script src="common/lib/elasticsearch.angular.js"></script>
+  
+
+        <!-- project-specific files -->
+        <script src="js/app.js"></script>
+        <script src="js/controllers.js"></script>
+    </head>
+
+    <body ng-controller="SearchCtrl">
+        <div style="padding: 10px" class="container-fluid">
+            <div class="row-fluid">
+                <span class="span3">
+                	<select ng-model="fieldSelect">
+                		<option ng-repeat="field in fields">{{field}}</option>
+                	</select>
+                    <input class="input-block-level" ng-model="queryTerm" type="search" ng-change="search()">
+                </span>&nbsp;
+                <button ng-click="search()" class="btn btn-success" type="button">Search</button>		Hits: <span class="badge">{{hitCount}}</span>
+                <!-- <p>{{queryTerm}}</p> -->
+            </div>
+
+            <!-- <p>{{data}}</p> -->
+
+            <div class="row-fluid">
+                <div class="span4">
+                    <li ng-repeat="result in results | filter: queryTerm">
+                        {{result._source.Subject}}
+                    </li>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+          

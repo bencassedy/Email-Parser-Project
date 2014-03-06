@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Email Search Form{% endblock title %}
+
+{% block content %}
+<h3>Email Search</h3>
+<p class="help-block"><small>Hold down Shift or CTRL+click to select multiple fields</small></p>
+<form method="post" name="email_search">
+    {{ form.hidden_tag() }}
+    <p> Please enter list of fields to search: <br>
+        {{ form.fields() }} <br>
+    </p>
+    <div> Select folders to search: <br>
+        {{ form.folders(style="height:200px;", class="form-control") }}
+    </div>
+    <div> Select recipients to search: <br>
+        {{ form.recipients(style="height:200px;", class="form-control") }}
+    </div>
+    <p> Select custodians to search: <br>
+        {{ form.custodians() }} <br>
+    </p>
+    <p>{{ form.some_choice }} A Boolean Choice</p>
+    <p><input type="submit" value="Email Search" class="btn btn-success"></p>
+</form>
+{% endblock content %}
+
