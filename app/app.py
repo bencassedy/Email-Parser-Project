@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, url_for, request
+from flask import Flask, make_response, redirect, render_template, url_for, request
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 from pymongo import MongoClient
@@ -105,19 +105,21 @@ def email_list(query=None, msg_id=None):
     return render_template('list.html', msgs=msgs, flds=flds, total=total, query=query)
 
 @app.route('/email_search', methods=['GET', 'POST'])
+#def email_search():
+#    form = SearchForm()
+#    form.folders.choices = [(f, f) for f in emails.distinct('X-Folder')]
+#    form.custodians.choices = [(f, f) for f in emails.distinct('X-Origin')]
+#    form.recipients.choices = [(f, f) for f in emails.distinct('To')]
+#    if request.method == 'POST' and form.validate():
+#        recipients = form.recipients.data
+#        recipients = list_to_string(recipients)
+#        results = es.search(index=config.INDEX, doc_type='email', body={'filter': {'query': {'match': {'To': {'query': recipients, 'operator': 'OR' }}}}})
+#        total = results['hits']['total']
+#        msgs = es_to_dict(results)
+#        return render_template('list.html', recipients=recipients, msgs=msgs, total=total)
+#    return render_template('search_form.html', form=form)
 def email_search():
-    form = SearchForm()
-    form.folders.choices = [(f, f) for f in emails.distinct('X-Folder')]
-    form.custodians.choices = [(f, f) for f in emails.distinct('X-Origin')]
-    form.recipients.choices = [(f, f) for f in emails.distinct('To')]
-    if request.method == 'POST' and form.validate():
-        recipients = form.recipients.data
-        recipients = list_to_string(recipients)
-        results = es.search(index=config.INDEX, doc_type='email', body={'filter': {'query': {'match': {'To': {'query': recipients, 'operator': 'OR' }}}}})
-        total = results['hits']['total']
-        msgs = es_to_dict(results)
-        return render_template('list.html', recipients=recipients, msgs=msgs, total=total)
-    return render_template('search_form.html', form=form)
+    return make_response(open('templates/search_form.html').read())
 
 @app.route('/emails/adv_search')
 def email_adv_search(query=None):
