@@ -119,7 +119,7 @@ def email_list(query=None, msg_id=None):
 #        return render_template('list.html', recipients=recipients, msgs=msgs, total=total)
 #    return render_template('search_form.html', form=form)
 def email_search():
-    return make_response(open('templates/search_form.html').read())
+    return make_response(open('app/static/search_form.html').read())
 
 @app.route('/emails/adv_search')
 def email_adv_search(query=None):
