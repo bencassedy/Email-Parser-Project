@@ -3,6 +3,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 from pymongo import MongoClient
 from bson.json_util import dumps, loads
+from bson.objectid import ObjectId
 from forms import SearchForm
 import config
 
@@ -80,8 +81,7 @@ def index():
 @app.route('/email/<message_id>/')
 def email_detail(message_id):
     # get email from mongodb using query by id
-    msg = emails.find_one({'Message-ID': message_id}) 
-    msg_id = str(msg['_id'])
+    msg = emails.find_one({'_id': ObjectId(message_id)}) 
     return render_template('detail.html', msg=msg)
 
 @app.route('/emails')

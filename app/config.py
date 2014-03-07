@@ -11,7 +11,8 @@ SETTINGS_BODY = {
                         'analysis': {
                             'analyzer': {
                                 'primary': {
-                                    'tokenizer': 'uax_url_email'
+                                    'tokenizer': 'uax_url_email',
+                                    'filter': ['standard', 'lowercase']
                                     }, 
                                 'folder': {
                                     'tokenizer': 'path_hierarchy'
