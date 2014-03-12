@@ -29,6 +29,7 @@ esApp.controller('SearchCtrl', function($scope, es) {
         });
     };
 
+
     es.indices.getMapping({index:'test_kaminski', type:'email'}, function(err, resp) {
         if (err) {
             $scope.fields = err.message;
@@ -40,4 +41,6 @@ esApp.controller('SearchCtrl', function($scope, es) {
     angular.element(document).ready(function () {
       $scope.search();
     });
+
+    $scope.predicate = '';
 });
