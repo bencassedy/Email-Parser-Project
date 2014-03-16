@@ -38,6 +38,28 @@ esApp.controller('SearchCtrl', function($scope, es) {
         }
     });
 
+
+    $scope.multiSearchArray = [];
+    $scope.multiSearchArrayResults = [];
+    
+    $scope.multisearch = function() {
+        angular.forEach($scope.multiSearchArray, function(value) {
+            es.count({
+                index: 'test_kaminski',
+                body: {
+                    term: {
+                        _all: value
+                    }
+                }
+            }).then(function(resp) {
+                $scope.multiSearchArrayResults.push({term: value, hits: resp.count});
+            }, function(err) {
+                $scope.multiSearchArrayResults.push({term: value, hits: err});
+            });
+        });
+    };
+
+
     angular.element(document).ready(function () {
       $scope.search();
     });
