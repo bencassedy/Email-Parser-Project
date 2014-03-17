@@ -59,14 +59,19 @@
                                             <th><input type="checkbox" ng-model="master"></th>
                                             <th><a href="" ng-click="predicate = '_source.Subject'; reverse=!reverse">Subject&nbsp;</a></th>
                                             <th><a href="" ng-click="predicate = '_source.Date'; reverse=!reverse">Date&nbsp;</a></th>
+                                            <th><a href="" ng-click="predicate = '_source.To'; reverse=!reverse">To&nbsp;</a></th>
+                                            <th><a href="" ng-click="predicate = '_source.From'; reverse=!reverse">From&nbsp;</a></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="result in results | filter: queryTerm | orderBy:predicate:reverse">
                                             <td><input id="checkSlave" type="checkbox" ng-checked="master"></td>
-                                            <td><a href="/email/{{result._source._id}}" ><small>{{result._source.Subject}}</small></a></td>
+                                            <td><a href="/email/{{result._source._id}}" data-toggle="tooltip" data-placement="bottom" title="{{result._source.body.slice(0,200)}} ..."><small>{{result._source.Subject}}</small></a></td>
                                             <td><small>{{result._source.Date}}</small></td>
-                                        </tr>
+                                            <td><small>{{result._source.To}</small></td>
+                                            <td><small>{{result._source.From}}</small></td>
+<!--                                             <td style="font-size: 8px;">{{result._source.body.slice(0,200) + " ..."}}</td>
+ -->                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
