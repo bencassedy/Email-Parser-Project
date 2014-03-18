@@ -14,7 +14,7 @@
         <title>Email Parser Project</title>
     </head>
 
-    <body ng-controller="SearchCtrl">
+    <body>
 
         <nav class="navbar navbar-default" role="navigation">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -27,9 +27,43 @@
             </button>
             <a class="navbar-brand" href="/">Email Parser Project</a>
           </div>
+
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="/emails">List</a></li>
+              <li><a href="#" data-toggle="collapse" data-target="#tags">Tags</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Options<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">All</a></li>
+                  <li><a href="#">Pivot</a></li>
+                  <li><a href="#">History</a></li>
+                  <li><a href="/email_search">Form Search</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Search Term Reports</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Help</a></li>
+                </ul>
+              </li>
+            </ul>
+            </div>
         </nav>
 
-        <div class="content container">
+        <div id="tags" class="collapse" style="margin-left: 5%; margin-bottom: 10px;" ng-controller="TagCtrl">
+            <h4>Tags:</h4>
+            <ul class="list-unstyled">
+                <li ng-repeat="tag in tags">
+                    <input type="checkbox" >
+                    <span>{{tag}}</span>
+                </li>
+            </ul>
+            <form ng-submit="addTag()">
+                <input type="text" ng-model="tagValue" size="30" placeholder="Add new tag">
+                <input class="btn btn-xs btn-success" type="submit" value="Add">
+            </form>
+        </div>
+
+        <div class="content container" ng-controller="SearchCtrl">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#search" data-toggle="tab">Email Instant Search</a></li>
                 <li><a href="#multisearch" data-toggle="tab">Multiple Term Search</a></li>
@@ -68,7 +102,7 @@
                                             <td><input id="checkSlave" type="checkbox" ng-checked="master"></td>
                                             <td><a href="/email/{{result._source._id}}" data-toggle="tooltip" data-placement="bottom" title="{{result._source.body.slice(0,200)}} ..."><small>{{result._source.Subject}}</small></a></td>
                                             <td><small>{{result._source.Date}}</small></td>
-                                            <td><small>{{result._source.To}</small></td>
+                                            <td><small>{{result._source.To}}</small></td>
                                             <td><small>{{result._source.From}}</small></td>
 <!--                                             <td style="font-size: 8px;">{{result._source.body.slice(0,200) + " ..."}}</td>
  -->                                        </tr>
