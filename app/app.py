@@ -13,6 +13,7 @@ app.config.from_object('config')
 client = MongoClient()
 db = client.enron
 emails = db.test_kaminski
+tags = db.test_tags
 
 email_list = []
 
@@ -143,6 +144,10 @@ def email_mlt(msg_id=None):
     msgs = es_to_dict(results)
 
     return render_template('list.html', msgs=msgs, total=total)
+
+@app.route('/add_tags', methods=['POST'])
+def add_tags(tags):
+    tags = request.args.get(
 
 if __name__ == '__main__':
     app.run(debug=True)
