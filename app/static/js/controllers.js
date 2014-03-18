@@ -67,7 +67,7 @@ esApp.controller('SearchCtrl', function($scope, es) {
     $scope.predicate = '';
 });
 
-esApp.controller('TagCtrl', function ($scope) {
+esApp.controller('TagCtrl', function($scope, $http, $window) {
     $scope.tags = [
         "Responsive",
         "Non-Responsive",
@@ -76,6 +76,20 @@ esApp.controller('TagCtrl', function ($scope) {
     ];
 
     $scope.addTag = function() {
+        $http
+            .post('/add_tag', {
+                name: $scope.tagValue
+            })
+            .success(function(data, status, headers, config) {
+                if (data.success) {
+                    $scope.tagSuccess = true;
+                } else {
+                    $window.alert('Adding of tag failed');
+                }
+            })
+            .error(function(data, status, headers, config) {
+            });
+
         $scope.tags.push($scope.tagValue);
         $scope.tagValue = '';
     }

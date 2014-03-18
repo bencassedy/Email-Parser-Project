@@ -57,7 +57,7 @@
                     <span>{{tag}}</span>
                 </li>
             </ul>
-            <form ng-submit="addTag()">
+            <form method="POST" ng-submit="addTag()">
                 <input type="text" ng-model="tagValue" size="30" placeholder="Add new tag">
                 <input class="btn btn-xs btn-success" type="submit" value="Add">
             </form>

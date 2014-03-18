@@ -1,4 +1,4 @@
-from flask import Flask, make_response, redirect, render_template, url_for, request
+from flask import Flask, make_response, redirect, render_template, url_for, request, jsonify
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 from pymongo import MongoClient
@@ -6,6 +6,7 @@ from bson.json_util import dumps, loads
 from bson.objectid import ObjectId
 from forms import SearchForm
 import config
+import json
 
 app = Flask(__name__, static_url_path='')
 app.config.from_object('config')
@@ -13,7 +14,7 @@ app.config.from_object('config')
 client = MongoClient()
 db = client.enron
 emails = db.test_kaminski
-tags = db.test_tags
+email_tags = db.test_tags
 
 email_list = []
 
@@ -145,9 +146,12 @@ def email_mlt(msg_id=None):
 
     return render_template('list.html', msgs=msgs, total=total)
 
-@app.route('/add_tags', methods=['POST'])
-def add_tags(tags):
-    tags = request.args.get(
+@app.route('/add_tag', methods=['POST'])
+def add_tag():
+    tag = json.loads(request.data)
+    email_tags.insert(tag)
+    return jsonify({'success': True})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
