@@ -66,3 +66,17 @@ esApp.controller('SearchCtrl', function($scope, es) {
 
     $scope.predicate = '';
 });
+
+esApp.controller('TagCtrl', function ($scope) {
+    $scope.tags = [
+        "Responsive",
+        "Non-Responsive",
+        "Privileged",
+        "Non-Privileged"
+    ];
+
+    $scope.addTag = function() {
+        $scope.tags.push($scope.tagValue);
+        $scope.tagValue = '';
+    }
+});
