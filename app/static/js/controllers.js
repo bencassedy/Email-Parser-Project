@@ -68,16 +68,23 @@ esApp.controller('SearchCtrl', function($scope, es) {
 });
 
 esApp.controller('TagCtrl', function($scope, $http, $window) {
-    $scope.tags = [
-        "Responsive",
-        "Non-Responsive",
-        "Privileged",
-        "Non-Privileged"
-    ];
+
+    $scope.getTags = function() {
+        $http
+            .get('/tags')
+            .success(function(data, status) {
+                $scope.tags = data;
+                $scope.status = status;
+            })
+            .error(function(data, status) {
+                $scope.tags = data || "Request failed";
+                $scope.status = status;
+            });
+    };
 
     $scope.addTag = function() {
         $http
-            .post('/add_tag', {
+            .post('/tags', {
                 name: $scope.tagValue
             })
             .success(function(data, status, headers, config) {
@@ -90,7 +97,9 @@ esApp.controller('TagCtrl', function($scope, $http, $window) {
             .error(function(data, status, headers, config) {
             });
 
-        $scope.tags.push($scope.tagValue);
+        $scope.tags.push({name: $scope.tagValue});
         $scope.tagValue = '';
-    }
+    };
+
+    
 });

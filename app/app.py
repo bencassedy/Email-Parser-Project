@@ -146,11 +146,15 @@ def email_mlt(msg_id=None):
 
     return render_template('list.html', msgs=msgs, total=total)
 
-@app.route('/add_tag', methods=['POST'])
-def add_tag():
-    tag = json.loads(request.data)
-    email_tags.insert(tag)
-    return jsonify({'success': True})
+@app.route('/tags', methods=['GET', 'POST'])
+def manage_tags():
+    if request.method == 'POST':
+        tag = json.loads(request.data)
+        email_tags.insert(tag)
+        return jsonify({'success': True})
+    if request.method == 'GET':
+        tags = email_tags.find()
+        return dumps(tags)
 
 
 if __name__ == '__main__':
