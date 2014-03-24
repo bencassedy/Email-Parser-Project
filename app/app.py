@@ -156,6 +156,12 @@ def manage_tags():
         tags = email_tags.find()
         return dumps(tags)
 
+@app.route('/tags_delete', methods=['POST'])
+def delete_tags():
+    tags = json.loads(request.data)
+    for tag in tags:
+        email_tags.remove({'name': tag['name']})
+    return jsonify({'success': True})
 
 if __name__ == '__main__':
     app.run(debug=True)

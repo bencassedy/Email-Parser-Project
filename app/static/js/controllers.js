@@ -19,6 +19,11 @@ esApp.controller('SearchCtrl', function($scope, es) {
                         default_field: $scope.fieldSelect, 
                         query: ($scope.queryTerm || '*')
                     }
+                },
+                highlight: {
+                    fields: {
+                        body: {}
+                    }
                 }
             }
         }).then(function (resp) {
@@ -67,7 +72,7 @@ esApp.controller('SearchCtrl', function($scope, es) {
     $scope.predicate = '';
 });
 
-esApp.controller('TagCtrl', function($scope, $http, $window) {
+esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($scope, $http, $window, $filter) {
 
     $scope.getTags = function() {
         $http
@@ -80,6 +85,7 @@ esApp.controller('TagCtrl', function($scope, $http, $window) {
                 $scope.tags = data || "Request failed";
                 $scope.status = status;
             });
+        return $scope.tags;
     };
 
     $scope.addTag = function() {
@@ -99,7 +105,41 @@ esApp.controller('TagCtrl', function($scope, $http, $window) {
 
         $scope.tags.push({name: $scope.tagValue});
         $scope.tagValue = '';
+        return $scope.tags;
+    };
+    
+    $scope.getSelectedTags = function() {
+        $scope.selectedTags = $filter('filter')($scope.tags, {selected: true});
+        $scope.selectedTagNames = [];
+        angular.forEach($scope.selectedTags, function(tag) {
+            angular.forEach(tag, function(value, key) {
+                if (key === 'name') {
+                    $scope.selectedTagNames.push(" " + value);
+                }
+            });
+        });
     };
 
+
+    $scope.deleteMessage = "Are you sure you want to delete the following tags? ";
     
-});
+    $scope.deleteTags = function(deleteMessage) {
+        $scope.getSelectedTags();
+        var okDelete = $window.confirm($scope.deleteMessage + $scope.selectedTagNames);
+        if (okDelete) {
+            $http
+                .post('/tags_delete', $scope.selectedTags)
+                .success(function(data, status, headers, config) {
+                    if (data.success) {
+                        $window.alert("Deletion of tags succeeded");
+                        $scope.getTags();
+                    } else {
+                        $window.alert("Deletion of tags failed");
+                    }
+                })
+                .error(function(data, status, headers, config) {
+
+            });
+        };
+    };
+}]);
