@@ -58,6 +58,12 @@ MAPPING_BODY = {
                             'index': 'analyzed', 
                             'analyzer': 'primary'
                             }
+                        },
+                    'suggest': {
+                        'type': 'completion',
+                        'index_analyzer': 'simple',
+                        'search_analyzer': 'simple',
+                        'preserve_separators': False
                         }
                     }
                 }

@@ -146,6 +146,7 @@ def email_mlt(msg_id=None):
 
     return render_template('list.html', msgs=msgs, total=total)
 
+# view and add tags
 @app.route('/tags', methods=['GET', 'POST'])
 def manage_tags():
     if request.method == 'POST':
@@ -156,6 +157,7 @@ def manage_tags():
         tags = email_tags.find()
         return dumps(tags)
 
+# delete tags
 @app.route('/tags_delete', methods=['POST'])
 def delete_tags():
     tags = json.loads(request.data)

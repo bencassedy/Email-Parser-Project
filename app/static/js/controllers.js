@@ -12,7 +12,8 @@ esApp.controller('SearchCtrl', function($scope, es) {
     $scope.search = function() {
         es.search({
             index: 'test_kaminski',
-            size: 50,
+            size: 200,
+            suggestText: ($scope.queryTerm || ''),
             body: {
                 query: {
                     query_string: {
@@ -21,6 +22,8 @@ esApp.controller('SearchCtrl', function($scope, es) {
                     }
                 },
                 highlight: {
+                    pre_tags: ["<mark>"],
+                    post_tags: ["</mark>"],
                     fields: {
                         body: {}
                     }
@@ -32,8 +35,32 @@ esApp.controller('SearchCtrl', function($scope, es) {
             }, function (err) {
                 $scope.results(err.message);
         });
+        es.suggest({
+            index: 'test_kaminski',
+            suggestMode: 'popular',
+            body: {
+                mysuggester: {
+                    text: ($scope.queryTerm || ''),
+                    term: {
+                        field: 'body',
+                        suggest_mode: 'always'
+                    }
+                }
+            }
+        }).then(function(response) {
+            $scope.suggestResults = response;
+        }, function(error) {
+            $scope.suggestResults = error.message;
+        })
     };
 
+    // $scope.toggleSuggester = function() {
+    //     if ($scope.queryTerm == '') {
+    //         $('p').hide();
+    //     } else {
+    //         $('p').show();
+    //     }
+    // };
 
     es.indices.getMapping({index:'test_kaminski', type:'email'}, function(err, resp) {
         if (err) {
