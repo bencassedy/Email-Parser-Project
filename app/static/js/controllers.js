@@ -1,4 +1,4 @@
-esApp.controller('SearchCtrl', function($scope, es) {
+esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', function($scope, $filter, es) {
     es.cluster.health(function (err, resp) {
         if (err) {
             $scope.data = err.message;
@@ -7,7 +7,30 @@ esApp.controller('SearchCtrl', function($scope, es) {
         }
     });
 
+
+    // $scope.toggleSuggester = function() {
+    //     if ($scope.queryTerm == '') {
+    //         $('p').hide();
+    //     } else {
+    //         $('p').show();
+    //     }
+    // };
+
+
+// populate select drop-down with email metadata choices, defaults to email body
+
     $scope.fieldSelect = 'body';
+
+    es.indices.getMapping({index:'test_kaminski', type:'email'}, function(err, resp) {
+        if (err) {
+            $scope.fields = err.message;
+        } else {
+            $scope.fields = Object.keys(resp.email.properties);
+        }
+    });
+
+
+// execute standard boolean-style search query
 
     $scope.search = function() {
         es.search({
@@ -29,48 +52,67 @@ esApp.controller('SearchCtrl', function($scope, es) {
                     }
                 }
             }
-        }).then(function (resp) {
+        }).then(function (resp) {   
             $scope.results = resp.hits.hits;
             $scope.hitCount = resp.hits.total;
             }, function (err) {
                 $scope.results(err.message);
         });
-        es.suggest({
-            index: 'test_kaminski',
-            suggestMode: 'popular',
-            body: {
-                mysuggester: {
-                    text: ($scope.queryTerm || ''),
-                    term: {
-                        field: 'body',
-                        suggest_mode: 'always'
-                    }
-                }
-            }
-        }).then(function(response) {
-            $scope.suggestResults = response;
-        }, function(error) {
-            $scope.suggestResults = error.message;
-        })
+        // es.suggest({ // is not working with completion suggester, only works with term suggester. Need to change mappings/settings
+        //     index: 'test_kaminski',
+        //     suggestMode: 'popular',
+        //     body: {
+        //         mysuggester: {
+        //             text: ($scope.queryTerm || ''),
+        //             term: {
+        //                 field: 'body',
+        //                 suggest_mode: 'always'
+        //             }
+        //         }
+        //     }
+        // }).then(function(response) {
+        //     $scope.suggestResults = response;
+        // }, function(error) {
+        //     $scope.suggestResults = error.message;
+        // })
     };
 
-    // $scope.toggleSuggester = function() {
-    //     if ($scope.queryTerm == '') {
-    //         $('p').hide();
-    //     } else {
-    //         $('p').show();
-    //     }
-    // };
 
-    es.indices.getMapping({index:'test_kaminski', type:'email'}, function(err, resp) {
-        if (err) {
-            $scope.fields = err.message;
-        } else {
-            $scope.fields = Object.keys(resp.email.properties);
-        }
-    });
+    
+    $scope.getSelectedResults = function() {
+        $scope.selectedResults = $filter('filter')($scope.results, {selected: true});
+        $scope.selectedResultIDs = [];
+        angular.forEach($scope.selectedResults, function(doc) {
+            $scope.selectedResultIDs.push(doc._id);
+        });
+    };
 
+// execute more-like-this search with multiple docs as input
 
+    $scope.mltSearch = function() {
+        $scope.results = [];
+        $scope.hitCount = 0;
+        angular.forEach($scope.selectedResultIDs, function(value) {
+            es.mlt({
+                index: 'test_kaminski',
+                type: 'email',
+                id: value,
+                mlt_fields: 'body',
+                // minDocFreq; 1, // results in error
+                minTermFreq: 1,
+                percentTermsToMatch: 0.8,
+                searchSize: 200
+            }).then(function (resp) {   
+                $scope.results = $scope.results.concat(resp.hits.hits);
+                $scope.hitCount += resp.hits.total;
+                }, function (err) {
+                    $scope.results(err.message);
+            });
+        });
+    };
+    
+//execute multiple searches in same text box to get hit count reports for all searches
+    
     $scope.multiSearchArray = [];
     $scope.multiSearchArrayResults = [];
     
@@ -97,9 +139,15 @@ esApp.controller('SearchCtrl', function($scope, es) {
     });
 
     $scope.predicate = '';
-});
+}]);
+
+
+// this controller handles CRUD-style requests for document tagging going to and from Mongo
 
 esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($scope, $http, $window, $filter) {
+
+
+// get list and populate select boxes with existing tags in tag db collection
 
     $scope.getTags = function() {
         $http
@@ -114,6 +162,9 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($
             });
         return $scope.tags;
     };
+
+
+// add tag to tag db collection
 
     $scope.addTag = function() {
         $http
@@ -134,7 +185,10 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($
         $scope.tagValue = '';
         return $scope.tags;
     };
-    
+ 
+
+// send list of selected tags over http to do CRUD operations
+
     $scope.getSelectedTags = function() {
         $scope.selectedTags = $filter('filter')($scope.tags, {selected: true});
         $scope.selectedTagNames = [];
@@ -147,6 +201,8 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($
         });
     };
 
+
+// delete tag from tagging db collection
 
     $scope.deleteMessage = "Are you sure you want to delete the following tags? ";
     
