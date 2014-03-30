@@ -19,8 +19,6 @@ email_tags = db.test_tags
 email_list = []
 
 for email in emails.find():
-    #e = dumps(email)
-    #e_dict = dict(e)
     email['_id'] = str(email['_id'])
     action = {
             "_index": config.INDEX,
@@ -57,12 +55,6 @@ def es_to_dict(results):
             resultset.append(hit['_source'])
     return resultset
 
-## helper function to sort mongodb keys, for use in search forms
-#def keys_to_sorted_list(k):
-#    keys = []
-#    keys.append(str(emails.distinct(k)))
-#    sorted_keys = keys.sort()
-#    return sorted_keys
 
 # helper function to stringify lists for es queries
 def list_to_string(lst):
@@ -80,9 +72,10 @@ def index():
     db_name = emails.full_name
     return render_template('landing.html', db_name=db_name)
 
+
+# get email from mongodb using query by id
 @app.route('/email/<message_id>/')
 def email_detail(message_id):
-    # get email from mongodb using query by id
     msg = emails.find_one({'_id': ObjectId(message_id)}) 
     return render_template('detail.html', msg=msg)
 
@@ -98,39 +91,70 @@ def email_list(query=None, msg_id=None):
         msgs = emails.find(fields=flds, limit=200)
         total = msgs.count()
 
-# execute basic keyword search
+# execute fuzzy keyword search
     elif request.args.get('search'):
-        results = es.search(index=config.INDEX, doc_type='email', body={'query': {'fuzzy_like_this': { 'fields': ['Subject', 'body'], 'like_text': query, 'prefix_length': 4, 'max_query_terms': 12, 'boost': 1.2 }}, 'sort': {'_score': {'order': 'desc' }}}, size=100, _source=True, analyze_wildcard=True)
+        results = es.search(index=config.INDEX, 
+                            doc_type='email', 
+                            body={
+                                  'query': {
+                                        'fuzzy_like_this': { 
+                                              'fields': ['Subject', 'body'], 
+                                              'like_text': query, 
+                                              'prefix_length': 4, 
+                                              'max_query_terms': 12, 
+                                              'boost': 1.2 
+                                              }
+                                        }, 
+                                  'sort': {
+                                      '_score': {
+                                          'order': 'desc' 
+                                          }
+                                      }
+                                  }, 
+                            size=200, 
+                            _source=True, 
+                            analyze_wildcard=True
+                            )
         total = results['hits']['total']
         msgs = es_to_dict(results)
 
     return render_template('list.html', msgs=msgs, flds=flds, total=total, query=query)
 
+# redirect to static page for angularJS functionality
 @app.route('/email_search', methods=['GET', 'POST'])
-#def email_search():
-#    form = SearchForm()
-#    form.folders.choices = [(f, f) for f in emails.distinct('X-Folder')]
-#    form.custodians.choices = [(f, f) for f in emails.distinct('X-Origin')]
-#    form.recipients.choices = [(f, f) for f in emails.distinct('To')]
-#    if request.method == 'POST' and form.validate():
-#        recipients = form.recipients.data
-#        recipients = list_to_string(recipients)
-#        results = es.search(index=config.INDEX, doc_type='email', body={'filter': {'query': {'match': {'To': {'query': recipients, 'operator': 'OR' }}}}})
-#        total = results['hits']['total']
-#        msgs = es_to_dict(results)
-#        return render_template('list.html', recipients=recipients, msgs=msgs, total=total)
-#    return render_template('search_form.html', form=form)
 def email_search():
     return make_response(open('app/static/search_form.html').read())
 
+
+# execute advanced boolean search
 @app.route('/emails/adv_search')
 def email_adv_search(query=None):
 
     query = request.args.get('search')
     
-# execute advanced boolean search
     if request.args.get('search'):
-        results = es.search(index=config.INDEX, doc_type='email', body={'filter': {'query': { 'query_string': { 'default_field': 'body', 'query': query }}}, 'sort': {'_score': {'order': 'desc'}}}, size=100, _source=True, analyze_wildcard=True, default_operator='AND') 
+        results = es.search(index=config.INDEX, 
+                            doc_type='email', 
+                            body={
+                                  'filter': {
+                                      'query': { 
+                                          'query_string': { 
+                                              'default_field': 'body', 
+                                              'query': query 
+                                              }
+                                          }
+                                      }, 
+                                   'sort': {
+                                       '_score': {
+                                           'order': 'desc'
+                                           }
+                                       }
+                                   }, 
+                            size=200, 
+                            _source=True, 
+                            analyze_wildcard=True, 
+                            default_operator='AND'
+                            ) 
         total = results['hits']['total']
         msgs = es_to_dict(results)
 
@@ -140,7 +164,21 @@ def email_adv_search(query=None):
 def email_mlt(msg_id=None):
 
 # execute More Like This search of single doc to find similar docs
-    results = es.mlt(index=config.INDEX, doc_type='email', id=msg_id, mlt_fields=['body'], percent_terms_to_match=0.7, min_doc_freq=1, min_term_freq=1, body={'sort': {'_score': {'order': 'desc'}}})
+    results = es.mlt(index=config.INDEX, 
+                     doc_type='email', 
+                     id=msg_id, 
+                     mlt_fields=['body'], 
+                     percent_terms_to_match=0.7, 
+                     min_doc_freq=1, 
+                     min_term_freq=1, 
+                     body={
+                         'sort': {
+                             '_score': {
+                                 'order': 'desc'
+                                 }
+                             }
+                         }
+                     )
     total = results['hits']['total']
     msgs = es_to_dict(results)
 

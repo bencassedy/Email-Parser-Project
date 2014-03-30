@@ -100,10 +100,11 @@
                                 <table class="table table-striped table-condensed table-hover">
                                     <thead>
                                         <tr>
-                                            <th><input type="checkbox" ng-model="master" ng-change="getSelectedResults()"></th>
+                                            <th><input type="checkbox" ng-model="master" ng-change="onMasterChange(master); getSelectedResults()"></th>
                                             <th><a href="" ng-click="predicate = '_source.Subject'; reverse=!reverse">Subject&nbsp;</a></th>
                                             <th><a href="" >Show Body&nbsp;</a></th>
                                             <th><a href="" ng-click="predicate = '_source.Date'; reverse=!reverse">Date&nbsp;</a></th>
+                                            <th><a href="" ng-click="predicate = '_score'; reverse=!reverse">Relevance Score&nbsp;</a></th>
                                             <th><a href="" ng-click="predicate = '_source.To'; reverse=!reverse">To&nbsp;</a></th>
                                             <th><a href="" ng-click="predicate = '_source.From'; reverse=!reverse">From&nbsp;</a></th>
                                         </tr>
@@ -115,6 +116,7 @@
                                             <td><a href="" ng-click="showBody = ! showBody"><span class="glyphicon glyphicon-chevron-right" ng-hide="showBody"></span><span class="glyphicon glyphicon-chevron-left" ng-show="showBody"></span></a></td>
                                             <td ng-show="showBody"><p ng-bind-html="result.highlight.body[0]">{{result.highlight.body[0]}}</p></td>
                                             <td><small>{{result._source.Date}}</small></td>
+                                            <td><small>{{result._score}}</small></td>
                                             <td><small>{{result._source.To}}</small></td>
                                             <td><small>{{result._source.From}}</small></td>
                                         </tr>
@@ -150,6 +152,7 @@
                     </table>
                 </div>
             </div>
+            <p>{{results}}</p>
         </div>
 
         <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>

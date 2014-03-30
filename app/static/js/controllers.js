@@ -100,7 +100,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', function($scope, $fil
                 mlt_fields: 'body',
                 // minDocFreq; 1, // results in error
                 minTermFreq: 1,
-                percentTermsToMatch: 0.8,
+                percentTermsToMatch: 0.9,
                 searchSize: 200
             }).then(function (resp) {   
                 $scope.results = $scope.results.concat(resp.hits.hits);
@@ -111,7 +111,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', function($scope, $fil
         });
     };
     
-//execute multiple searches in same text box to get hit count reports for all searches
+//execute multiple searches in same text box to get hit count reports for each search
     
     $scope.multiSearchArray = [];
     $scope.multiSearchArrayResults = [];
@@ -133,9 +133,28 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', function($scope, $fil
         });
     };
 
+    
+// master checkbox toggles all checkboxes
+
+    $scope.master = false; 
+    
+    $scope.onMasterChange = function(master) {
+         for (var i = 0; i < $scope.results.length; i++) {
+             $scope.results[i].selected = $scope.master;
+         }
+    };
+    
+    $scope.change = function(value) {
+        for (var i = 0; i < $scope.results.length; i++) {
+            if($scope.master == true){
+                $scope.results[i].selected = $scope.master;
+            }
+        }
+    };
+
 
     angular.element(document).ready(function () {
-      $scope.search();
+        $scope.search();
     });
 
     $scope.predicate = '';
@@ -226,3 +245,46 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($
         };
     };
 }]);
+
+// directives
+
+// esApp.directive('checkboxAll', function () {
+//   return function(scope, iElement, iAttrs) {
+//     var parts = iAttrs.checkboxAll.split('.');
+    
+//     //var masterCb = $element.children()[0];
+    
+//     iElement.attr('type','checkbox');
+//     iElement.bind('change', function (evt) {
+//       scope.$apply(function () {
+//         var setValue = iElement.prop('checked');
+//         angular.forEach(scope.$eval(parts[0]), function (v) {
+//           v[parts[1]] = setValue;
+//         });
+//       });
+//     });
+//     scope.$watch(parts[0], function (newVal) {
+//       var hasTrue, hasFalse;
+//       angular.forEach(newVal, function (v) {
+//         if (v[parts[1]]) {
+//           hasTrue = true;
+//         } else {
+//           hasFalse = true;
+//         }
+//       });
+//       if (hasTrue && hasFalse) {
+//         iElement.attr('checked', false);
+//         iElement.addClass('greyed');
+       
+//       } else {
+//         iElement.attr('checked', hasTrue);
+//         iElement.removeClass('greyed');
+     
+//       }
+      
+      
+     
+      
+//     }, true);
+//   };
+// });
