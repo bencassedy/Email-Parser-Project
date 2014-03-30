@@ -3,7 +3,7 @@ Email-Parser-Project
 
 Test DB of Emails for Advanced Querying and Analytics
 
-This is a test project to parse emails, store them in a document-based database (MongoDB), query them using Elasticsearch, and tag them using HTML and AngularJS.
+This is a test project to parse emails, store them in a document-based database (MongoDB), query them using Elasticsearch, and tag them using HTML and AngularJS. Part of the design philosophy with this project is that the records are all either JSON or a close equivalent (python dict or JS object), so that the records can easily be passed back and forth between the MVC components with minimal transformation or ORM. In my experience thus far with this project, python, mongo, es, and angularjs all play extremely nicely together (largely due to the JSON commonality), making this what I hope is an effective stack.
 
 Most of the basic functionality is there (parsing, storage, querying, MVC views, etc.) but this is definitely a work in progress. Future plans for this project include aggregation/facet analysis and statistics, along with more advanced text analytics such as a binary classifier (naive Bayes), regression, knn, and clustering, all most likely via the scikit-learn Python package.
 
