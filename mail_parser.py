@@ -2,8 +2,8 @@ import os
 
 from email.parser import Parser
 from datetime import *
-from pymongo import MongoClient
 from utils import config
+from utils.mongo_utils import init_mongo, write_to_mongo
 
 
 def date_parser(s):
@@ -33,23 +33,8 @@ def msg_to_dict(msg):
     return metadata
 
 
-def init_mongo(collection_name):
-    client = MongoClient()
-    db = client.enron
-    db.drop_collection(collection_name)
-    db.create_collection(collection_name)
-
-    return client
-
-
-def write_to_mongo(db, collection_name, new_posts):
-
-    db[collection_name].insert(new_posts)
-    print "Index has {} docs".format(db[collection_name].count())
-    
-
 if __name__ == '__main__':
-    mongo = init_mongo(config.ENRON_COLLECTION)
+    mongo = init_mongo(config.MONGO_ENRON_COLLECTION)
 
     for root, subs, files in os.walk(config.MAIL_DIR):
         mails = []
@@ -60,6 +45,6 @@ if __name__ == '__main__':
                     mails.append(msg_to_dict(message))
 
         if mails:
-            write_to_mongo(mongo.enron, config.ENRON_COLLECTION, mails)
+            write_to_mongo(mongo.enron, config.MONGO_ENRON_COLLECTION, mails)
         else:
             continue

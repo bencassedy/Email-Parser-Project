@@ -1,6 +1,6 @@
-Flask
-Flask-Script
-Flask-WTF
+flask
+flask-script
+flask-wtf
 mongoengine
 pymongo==3.0.3
 pyelasticsearch
