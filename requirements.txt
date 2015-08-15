@@ -2,6 +2,6 @@ Flask
 Flask-Script
 Flask-WTF
 mongoengine
-pymongo
+pymongo==3.0.3
 pyelasticsearch
 
