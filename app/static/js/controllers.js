@@ -1,4 +1,4 @@
-esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', function($scope, $filter, es) {
+esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'ResultService', function($scope, $filter, es, TagService, ResultService) {
     es.cluster.health(function (err, resp) {
         if (err) {
             $scope.data = err.message;
@@ -85,6 +85,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', function($scope, $fil
         angular.forEach($scope.selectedResults, function(doc) {
             $scope.selectedResultIDs.push(doc._id);
         });
+        ResultService.sharedResults = $scope.selectedResultIDs;
     };
 
 // execute more-like-this search with multiple docs as input
@@ -152,6 +153,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', function($scope, $fil
         }
     };
 
+    $scope.sharedTags = TagService;
 
     angular.element(document).ready(function () {
         $scope.search();
@@ -163,7 +165,8 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', function($scope, $fil
 
 // this controller handles CRUD-style requests for document tagging going to and from Mongo
 
-esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($scope, $http, $window, $filter) {
+esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagService', 'ResultService', function($scope, $http, $window, $filter, TagService, ResultService) {
+
 
 
 // get list and populate select boxes with existing tags in tag db collection
@@ -210,6 +213,7 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($
 
     $scope.getSelectedTags = function() {
         $scope.selectedTags = $filter('filter')($scope.tags, {selected: true});
+        TagService.sharedTags = $scope.selectedTags;
         $scope.selectedTagNames = [];
         angular.forEach($scope.selectedTags, function(tag) {
             angular.forEach(tag, function(value, key) {
@@ -221,7 +225,7 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($
     };
 
 
-// delete tag from tagging db collection
+// delete tag from tag collection
 
     $scope.deleteMessage = "Are you sure you want to delete the following tags? ";
     
@@ -244,7 +248,17 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', function($
             });
         };
     };
+
+
+// get selected results from search controller for applying tags to records
+
+    $scope.selectedResultIDs = ResultService;
+
+    
+
 }]);
+
+
 
 // directives
 
