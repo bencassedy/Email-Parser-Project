@@ -1,4 +1,4 @@
-MAIL_DIR = '/Users/bencassedy/projects/enron/enron_mail_20110402/maildir'
+MAIL_DIR = '/Users/bcassedy/projects/enron/maildir'
 MONGO_ENRON_DB = 'enron'
 MONGO_ENRON_COLLECTION = 'enron_collection'
 
@@ -62,12 +62,6 @@ MAPPING_BODY = {
                 'index': 'analyzed',
                 'analyzer': 'primary'
             }
-        },
-        'suggest': {
-            'type': 'completion',
-            'index_analyzer': 'simple',
-            'search_analyzer': 'simple',
-            'preserve_separators': False
         }
     }
 }

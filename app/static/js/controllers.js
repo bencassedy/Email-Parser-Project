@@ -21,11 +21,11 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
 
     $scope.fieldSelect = 'body';
 
-    es.indices.getMapping({index:'test_kaminski', type:'email'}, function(err, resp) {
+    es.indices.getMapping({index:'enron', type:'email'}, function(err, resp) {
         if (err) {
             $scope.fields = err.message;
         } else {
-            $scope.fields = Object.keys(resp.email.properties);
+            $scope.fields = Object.keys(resp.enron.mappings.email.properties);
         }
     });
 
@@ -34,7 +34,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
 
     $scope.search = function() {
         es.search({
-            index: 'test_kaminski',
+            index: 'enron',
             size: 200,
             suggestText: ($scope.queryTerm || ''),
             body: {
@@ -59,7 +59,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
                 $scope.results(err.message);
         });
         // es.suggest({ // is not working with completion suggester, only works with term suggester. Need to change mappings/settings
-        //     index: 'test_kaminski',
+        //     index: 'enron',
         //     suggestMode: 'popular',
         //     body: {
         //         mysuggester: {
@@ -95,7 +95,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
         $scope.hitCount = 0;
         angular.forEach($scope.selectedResultIDs, function(value) {
             es.mlt({
-                index: 'test_kaminski',
+                index: 'enron',
                 type: 'email',
                 id: value,
                 mlt_fields: 'body',
@@ -120,7 +120,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
     $scope.multisearch = function() {
         angular.forEach($scope.multiSearchArray, function(value) {
             es.count({
-                index: 'test_kaminski',
+                index: 'enron',
                 body: {
                     term: {
                         _all: value

@@ -18,15 +18,9 @@ def build_es_action_list():
     for email in emails.find():
         email['_id'] = str(email['_id'])  # map mongo_id to es_id
 
-        # we want to use custodian as a logical record type as it provides for reasonable
-        # vertical partitioning to facilitate per-custodian aggregations and lookups
-        try:
-            custodian = email['X-Origin'].lower()
-        except KeyError:
-            custodian = 'no_custodian'
         action = {
             "_index": ES_INDEX,
-            "_type": custodian,
+            "_type": 'email',
             "_id": email['_id'],
             "_source": email
         }

@@ -8,7 +8,7 @@ from utils.elasticsearch_utils import es, es_results_to_dict
 from utils.mongo_utils import mongo_client
 
 app = Flask(__name__, static_url_path='')
-app.config.from_object('config')
+app.config.from_object('utils.config')
 
 db = mongo_client[MONGO_ENRON_DB]
 emails = db[MONGO_ENRON_COLLECTION]
@@ -52,7 +52,7 @@ def email_list(query=None, msg_id=None):
 
     # if no search, return all results, limit to 200 for debugging purposes
     if query is None:
-        msgs = emails.find(fields=display_fields, limit=200)
+        msgs = emails.find(projection=display_fields, limit=200)
         total = msgs.count()
 
     # execute fuzzy keyword search
@@ -87,7 +87,7 @@ def email_list(query=None, msg_id=None):
 # redirect to static page for angularJS functionality
 @app.route('/email_search', methods=['GET', 'POST'])
 def email_search():
-    return make_response(open('app/static/search_form.html').read())
+    return make_response(open('static/search_form.html').read())
 
 
 # execute advanced boolean search
@@ -127,7 +127,7 @@ def email_adv_search(query=None):
 @app.route('/emails/mlt/<msg_id>/')
 def email_mlt(msg_id=None):
 
-# execute More Like This search of single doc to find similar docs
+    # execute More Like This search of single doc to find similar docs
     results = es.mlt(index=ES_INDEX,
                      doc_type='email', 
                      id=msg_id, 
