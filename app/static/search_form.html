@@ -111,7 +111,7 @@
                             </tr>
                             </thead>
                             <tbody style="font-size: 80%;">
-                            <tr ng-repeat="result in results | filter: queryTerm | orderBy:predicate:reverse">
+                            <tr ng-repeat="result in results track by $index | filter: queryTerm | orderBy:predicate:reverse">
                                 <td><input id="checkSlave" type="checkbox" ng-checked="master" ng-model="result.selected" ng-change="getSelectedResults()"></td>
                                 <td style="width: 250px"><a href="/email/{{result._source._id}}" data-toggle="tooltip" data-placement="bottom" title="{{result._source.body.slice(0,200)}} ..."><small>{{result._source.Subject}}</small></a></td>
                                 <td><a href="" ng-click="showBody = ! showBody"><span class="glyphicon glyphicon-chevron-right" ng-hide="showBody"></span><span class="glyphicon glyphicon-chevron-left" ng-show="showBody"></span></a></td>
