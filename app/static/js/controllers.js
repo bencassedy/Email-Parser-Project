@@ -7,14 +7,6 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
         }
     });
 
-    // $scope.toggleSuggester = function() {
-    //     if ($scope.queryTerm == '') {
-    //         $('p').hide();
-    //     } else {
-    //         $('p').show();
-    //     }
-    // };
-
     // populate select drop-down with email metadata choices, defaults to email body
     $scope.fieldSelect = 'body';
 
@@ -26,18 +18,29 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
         }
     });
 
-
     // execute standard boolean-style search query
     $scope.search = function() {
+        // elasticsearch will return an error if the query string ends with whitespace,
+        // so we'll put in some conditional handling of the query string before sending to ES
+        var queryTerm;
+        if (!$scope.queryTerm) {
+            queryTerm = '*';
+        } else {
+            if ($scope.queryTerm.substr(-1) === ' '){
+                queryTerm = $scope.queryTerm.trim();
+            } else {
+                queryTerm = $scope.queryTerm;
+            }
+        }
+
         es.search({
             index: 'enron',
             size: 200,
-            suggestText: ($scope.queryTerm || ''),
             body: {
                 query: {
                     query_string: {
                         default_field: $scope.fieldSelect, 
-                        query: ($scope.queryTerm || '*')
+                        query: queryTerm
                     }
                 },
                 highlight: {
@@ -52,29 +55,9 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
             $scope.results = resp.hits.hits;
             $scope.hitCount = resp.hits.total;
             }, function (err) {
-                $scope.results(err.message);
         });
-        // es.suggest({ // is not working with completion suggester, only works with term suggester. Need to change mappings/settings
-        //     index: 'enron',
-        //     suggestMode: 'popular',
-        //     body: {
-        //         mysuggester: {
-        //             text: ($scope.queryTerm || ''),
-        //             term: {
-        //                 field: 'body',
-        //                 suggest_mode: 'always'
-        //             }
-        //         }
-        //     }
-        // }).then(function(response) {
-        //     $scope.suggestResults = response;
-        // }, function(error) {
-        //     $scope.suggestResults = error.message;
-        // })
     };
 
-
-    
     $scope.getSelectedResults = function() {
         $scope.selectedResults = $filter('filter')($scope.results, {selected: true});
         $scope.selectedResultIDs = [];
@@ -102,7 +85,6 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
                 $scope.results = $scope.results.concat(resp.hits.hits);
                 $scope.hitCount += resp.hits.total;
                 }, function (err) {
-                    $scope.results(err.message);
             });
         });
     };
@@ -137,14 +119,13 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
     
     // master checkbox toggles all checkboxes
     $scope.master = false;
-    
-    $scope.onMasterChange = function(master) {
+    $scope.onMasterChange = function() {
          for (var i = 0; i < $scope.results.length; i++) {
              $scope.results[i].selected = $scope.master;
          }
     };
     
-    $scope.change = function(value) {
+    $scope.change = function() {
         for (var i = 0; i < $scope.results.length; i++) {
             if($scope.master == true){
                 $scope.results[i].selected = $scope.master;
@@ -165,8 +146,6 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
 // this controller handles CRUD-style requests for document tagging going to and from Mongo
 esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagService', 'ResultService', function($scope, $http, $window, $filter, TagService, ResultService) {
 
-
-
     // get list and populate select boxes with existing tags in tag db collection
     $scope.getTags = function() {
         $http
@@ -181,7 +160,6 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagServic
             });
         return $scope.tags;
     };
-
 
     // add tag to tag db collection
     $scope.addTag = function() {
@@ -203,7 +181,6 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagServic
         $scope.tagValue = '';
         return $scope.tags;
     };
- 
 
     // send list of selected tags over http to do CRUD operations
     $scope.getSelectedTags = function() {
@@ -218,7 +195,6 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagServic
             });
         });
     };
-
 
     // delete tag from tag collection
     $scope.deleteMessage = "Are you sure you want to delete the following tags? ";
@@ -240,18 +216,12 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagServic
                 .error(function(data, status, headers, config) {
 
             });
-        };
+        }
     };
-
 
     // get selected results from search controller for applying tags to records
     $scope.selectedResultIDs = ResultService;
-
-    
-
 }]);
-
-
 
 // directives
 
@@ -288,10 +258,6 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagServic
 //         iElement.removeClass('greyed');
      
 //       }
-      
-      
-     
-      
 //     }, true);
 //   };
 // });
