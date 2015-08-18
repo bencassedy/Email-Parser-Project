@@ -7,7 +7,6 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
         }
     });
 
-
     // $scope.toggleSuggester = function() {
     //     if ($scope.queryTerm == '') {
     //         $('p').hide();
@@ -16,9 +15,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
     //     }
     // };
 
-
-// populate select drop-down with email metadata choices, defaults to email body
-
+    // populate select drop-down with email metadata choices, defaults to email body
     $scope.fieldSelect = 'body';
 
     es.indices.getMapping({index:'enron', type:'email'}, function(err, resp) {
@@ -30,8 +27,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
     });
 
 
-// execute standard boolean-style search query
-
+    // execute standard boolean-style search query
     $scope.search = function() {
         es.search({
             index: 'enron',
@@ -88,8 +84,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
         ResultService.sharedResults = $scope.selectedResultIDs;
     };
 
-// execute more-like-this search with multiple docs as input
-
+    // execute more-like-this search with multiple docs as input
     $scope.mltSearch = function() {
         $scope.results = [];
         $scope.hitCount = 0;
@@ -99,7 +94,7 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
                 type: 'email',
                 id: value,
                 mlt_fields: 'body',
-                // minDocFreq; 1, // results in error
+                minDocFreq: 1,
                 minTermFreq: 1,
                 percentTermsToMatch: 0.9,
                 searchSize: 200
@@ -112,22 +107,27 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
         });
     };
     
-//execute multiple searches in same text box to get hit count reports for each search
-    
+    //execute multiple searches in same text box to get hit count reports for each search
     $scope.multiSearchArray = [];
     $scope.multiSearchArrayResults = [];
     
-    $scope.multisearch = function() {
+    $scope.multiSearch = function() {
         angular.forEach($scope.multiSearchArray, function(value) {
-            es.count({
+            es.search({
                 index: 'enron',
                 body: {
-                    term: {
-                        _all: value
+                    filter: {
+                        query: {
+                            query_string: {
+                                query: value,
+                                default_operator: "AND"
+                            }
+                        }
                     }
-                }
+                },
+                searchType: "count"
             }).then(function(resp) {
-                $scope.multiSearchArrayResults.push({term: value, hits: resp.count});
+                $scope.multiSearchArrayResults.push({term: value, hits: resp.hits.total});
             }, function(err) {
                 $scope.multiSearchArrayResults.push({term: value, hits: err});
             });
@@ -135,9 +135,8 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
     };
 
     
-// master checkbox toggles all checkboxes
-
-    $scope.master = false; 
+    // master checkbox toggles all checkboxes
+    $scope.master = false;
     
     $scope.onMasterChange = function(master) {
          for (var i = 0; i < $scope.results.length; i++) {
@@ -164,13 +163,11 @@ esApp.controller('SearchCtrl', ['$scope', '$filter', 'es', 'TagService', 'Result
 
 
 // this controller handles CRUD-style requests for document tagging going to and from Mongo
-
 esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagService', 'ResultService', function($scope, $http, $window, $filter, TagService, ResultService) {
 
 
 
-// get list and populate select boxes with existing tags in tag db collection
-
+    // get list and populate select boxes with existing tags in tag db collection
     $scope.getTags = function() {
         $http
             .get('/tags')
@@ -186,8 +183,7 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagServic
     };
 
 
-// add tag to tag db collection
-
+    // add tag to tag db collection
     $scope.addTag = function() {
         $http
             .post('/tags', {
@@ -209,8 +205,7 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagServic
     };
  
 
-// send list of selected tags over http to do CRUD operations
-
+    // send list of selected tags over http to do CRUD operations
     $scope.getSelectedTags = function() {
         $scope.selectedTags = $filter('filter')($scope.tags, {selected: true});
         TagService.sharedTags = $scope.selectedTags;
@@ -225,8 +220,7 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagServic
     };
 
 
-// delete tag from tag collection
-
+    // delete tag from tag collection
     $scope.deleteMessage = "Are you sure you want to delete the following tags? ";
     
     $scope.deleteTags = function(deleteMessage) {
@@ -250,8 +244,7 @@ esApp.controller('TagCtrl', ['$scope', '$http', '$window', '$filter', 'TagServic
     };
 
 
-// get selected results from search controller for applying tags to records
-
+    // get selected results from search controller for applying tags to records
     $scope.selectedResultIDs = ResultService;
 
     
